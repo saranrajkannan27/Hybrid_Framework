@@ -40,12 +40,8 @@ public class LoginPage extends ReuseableLibrary {
 	
 		driver.manage().timeouts().implicitlyWait(0, TimeUnit.MILLISECONDS);
 		driver.get("https://www.google.in/");
-	  //driver.navigate().to("https://portal.bsnl.in/myportal/");
-
-
 		
-		
-
+	 //driver.navigate().to("https://portal.bsnl.in/myportal/");
 	//	javascriptEntertext();
 	//	javascriptClick();
 	//	isclickable();

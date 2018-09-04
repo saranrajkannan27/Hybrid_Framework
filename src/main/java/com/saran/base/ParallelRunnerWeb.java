@@ -8,17 +8,20 @@ import java.util.Map.Entry;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.codepine.api.testrail.TestRailException;
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
 import com.relevantcodes.extentreports.LogStatus;
 
 import com.saran. testdataAccess.MSExcelReader;
 import com.saran.testUtils.TestParameters;
+import com.saran.testUtils.TestRailListener;
+import com.saran.testUtils.Utility;
 import com.saran.testUtils.WebDriverFactory;
 
 
 
-public class ParallelRunnerWeb implements Runnable {
+public class ParallelRunnerWeb extends Utility implements Runnable {
 
 	//private Workbook dataTable;
 	private TestParameters testParameters;
@@ -27,12 +30,15 @@ public class ParallelRunnerWeb implements Runnable {
 	private WebDriver driver;
 	private ExtentReports report;
 	private ExtentTest test;
+	String testRailEnabled=testRailProperties.getProperty("testRail.enabled");
+	private TestRailListener testRailListenter;
 
-	public ParallelRunnerWeb(TestParameters testParameters,MSExcelReader dataTable,ExtentReports report) {
+	public ParallelRunnerWeb(TestParameters testParameters,MSExcelReader dataTable,ExtentReports report, TestRailListener testRailListenter) {
 
 		this.dataTable = dataTable;
 		this.testParameters = testParameters;
 		this.report = report;
+		this.testRailListenter=testRailListenter;
 	}
 
 	@Override
@@ -48,28 +54,36 @@ public class ParallelRunnerWeb implements Runnable {
 			invokeTestScript(getKeywords());			
 			test.log(LogStatus.INFO, testParameters.getCurrentTestcase()+" execution completed","");
 			report.endTest(test);
-
+			report.flush();
+			testRailReport();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			report.flush();
+			testRailReport();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			report.flush();
+			testRailReport();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			report.flush();
+			testRailReport();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			report.flush();
+			testRailReport();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			report.flush();
+			testRailReport();
 		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			report.flush();
+			testRailReport();
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			report.flush();
+			testRailReport();
 		}
 
 
@@ -78,6 +92,7 @@ public class ParallelRunnerWeb implements Runnable {
 
 
 	public LinkedHashMap<String, String>getKeywords(){
+		
 		LinkedHashMap<String,String> keywordMap = new LinkedHashMap<String,String>();
 		keywordMap= dataTable.getRowData("BusinessComponents",testParameters.getCurrentTestcase());
 		return keywordMap;
@@ -114,7 +129,38 @@ public class ParallelRunnerWeb implements Runnable {
 	}
 
 
+	private void testRailReport() {
+		
+		try {
+		
+		if(test.getRunStatus()==LogStatus.PASS && testRailEnabled.equalsIgnoreCase("true")) {
+			
+			int testRunID=Integer.parseInt(testRailProperties.getProperty("testRail.runId"));
+			int testcaseID=Integer.parseInt( testParameters.getTestRailId());
+			
+		testRailListenter.addTestResult(testRunID,testcaseID,1);
+		test.log(LogStatus.INFO, "Result for Test case with ID <b>" +  testParameters.getTestRailId() + "</b> is <b>PASSED</b> in TestRail");
+		}else {
+			
+		testRailListenter.addTestResult(Integer.parseInt(testRailProperties.getProperty("testRail.runId")),Integer.parseInt( testParameters.getTestRailId()),5);
+		test.log(LogStatus.INFO, "Result for Test case with ID <b>" +  testParameters.getTestRailId() + "</b> is <b>PASSED</b> in TestRail");
+			
+		}
+		}
+		catch(TestRailException e) {
+			
+			if(e.getResponseCode()==400) {
+				test.log(LogStatus.FAIL, "TestRail not updated for the testcase "+testParameters.getCurrentTestcase()+"  with testrail ID "+testParameters.getTestRailId());
+				test.log(LogStatus.INFO, e);
+			}
+			
+		}
 
+
+		
+		
+		
+	}
 	public void end() {
 
 		if(driver!=null) {

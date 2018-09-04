@@ -21,6 +21,7 @@ import com.saran.reporting.*;
 import com.saran. testdataAccess.MSExcelReader;
 import com.saran.testUtils.FrameworkProperties;
 import com.saran.testUtils.TestParameters;
+import com.saran.testUtils.TestRailListener;
 import com.saran.testUtils.Utility;
 import com.saran.testUtils.WebDriverFactory;
 
@@ -33,9 +34,10 @@ import com.saran.testUtils.WebDriverFactory;
 public class Main {
 
 	private static String absolutepath;
-	private static FrameworkProperties globalproperties;
-	private static String propertyFilePath = "./src/resources/Properties/GlobalProperties.properties";
 	private static Properties properties;
+	private static Properties testRailproperties;
+	private static FrameworkProperties globalproperties;
+	private static FrameworkProperties frameworkTestRailProperties;
 	private static Workbook runManager;
 	private static LinkedList<TestParameters> testInstancetoRun;
 	private static Workbook dataTable;
@@ -44,7 +46,9 @@ public class Main {
 	private static TestParameters testParameters;
 	private static ExtentReports report;
 	
-	
+	private static String propertyFilePath = "./src/resources/Properties/GlobalProperties.properties";
+	private static String testRailpropertyFilePath = "./src/resources/Properties/TestRailProperties.properties";
+	private static TestRailListener testRailListener;
 
 	public  static void main(String[] args) {
 		
@@ -52,6 +56,7 @@ public class Main {
 		System.out.println("prepare");
 		intializeTestReport();
 		System.out.println("intializeTestReport");
+		intializeTestRailReporting();
 		collectRuninfo();
 		System.out.println("collectRuninfo");
 		intializeDataTable();
@@ -77,7 +82,19 @@ public class Main {
 	}
 
 
-
+   private static void intializeTestRailReporting() {
+	   
+	  if( testRailproperties.getProperty("testRail.enabled").equalsIgnoreCase("true")) {
+		  
+		  int projectId= Integer.parseInt(testRailproperties.getProperty("testRail.projectId"));
+		  testRailListener= new TestRailListener(projectId);
+		  testRailListener.intialize();
+		  
+		  if(testRailproperties.getProperty("testRail.addNewRun").equalsIgnoreCase("True")) {
+			  testRailListener.addTestRun();
+		  }  
+	  }
+   }
 	/**
 	 * prepare method is used to get framework properties.
 	 */
@@ -85,6 +102,7 @@ public class Main {
 		
 		setAbsolutepath();
 		collectGlobalProperties();
+		collectTestRailProperties();
 	
 	}
 	
@@ -117,6 +135,17 @@ public class Main {
 	}
 	
 	
+	private static void collectTestRailProperties() {
+		
+		frameworkTestRailProperties = FrameworkProperties.getInstance();
+		
+		testRailproperties=	frameworkTestRailProperties.loadPropertyFile(testRailpropertyFilePath );
+		
+		Utility utils=new Utility();		
+		utils.setTestRailPropeties(testRailproperties);
+	}
+	
+	
 	private static void collectRuninfo() {
 		
 		String testSuite = properties.getProperty("TestSuite");
@@ -146,7 +175,7 @@ public class Main {
 			String executiontype=properties.getProperty("ExecutionType");
 			
 			if(executiontype.equalsIgnoreCase("Webapp")){
-			testRunner = new ParallelRunnerWeb(testInstancetoRun.get(currentTestInstance), MSExcelReader.getInstance(), report);
+			testRunner = new ParallelRunnerWeb(testInstancetoRun.get(currentTestInstance), MSExcelReader.getInstance(), report,testRailListener);
 			parallelExecutor.execute(testRunner);
 			}
 			if(executiontype.equalsIgnoreCase("Mobile")) {

@@ -25,6 +25,7 @@ public class Utility {
 	public WebDriver driver;
 	public MSExcelReader dataTable;
 	public static Properties properties;
+	public static Properties testRailProperties;
 	public AndroidDriver androiddriver;
 	public ExtentTest test;
 
@@ -48,6 +49,11 @@ public class Utility {
 	public void setPropeties(Properties properties) {
 		this.properties = properties;
 	}
+	
+	public void setTestRailPropeties(Properties testRailProperties) {
+		this.testRailProperties= testRailProperties;
+	}
+
 
 
 	public static String getCurrentFormattedTime(String format) {

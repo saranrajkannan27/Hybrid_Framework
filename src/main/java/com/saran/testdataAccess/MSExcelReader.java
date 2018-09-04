@@ -175,6 +175,7 @@ public class MSExcelReader {
 			if(getData(Suite, i,"Execute").equalsIgnoreCase("Yes")) {
 				
 				testparameters.setCurrentTestcase(getData(Suite,i,"TC_ID"));
+				testparameters.setTestRailId(getData(Suite,i,"TESTRAIL_ID"));
 				testparameters.setDescription(getData(Suite,i,"Description"));
 				testparameters.setExecuteCurrentTestcase(getData(Suite,i,"Execute"));
 				testparameters.setBrowser(getData(Suite,i,"Browser"));

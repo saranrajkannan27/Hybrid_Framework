@@ -9,6 +9,7 @@ public class TestParameters {
 	private String setCategory;
 	private String execute;
 	private String browser;
+	private String testRailId;
 	
 	public String getCurrentTestcase() {
 		return currentTestcase;
@@ -41,6 +42,13 @@ public class TestParameters {
 	
 	public String getBrowser() {
 		return browser;
+	}
+	
+	public String getTestRailId() {
+		return testRailId;
+	}
+	public void setTestRailId(String testRailId) {
+		this.testRailId = testRailId;
 	}
 
 }
