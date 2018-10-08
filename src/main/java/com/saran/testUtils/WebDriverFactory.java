@@ -17,7 +17,7 @@ public class WebDriverFactory {
 		
 		switch(browser) {
 		
-		case "Chrome":
+		case "chrome":
 			ChromeOptions options = new ChromeOptions();
 			options.addArguments("--disable-notifications");
 			options.addArguments("--start-maximized");
@@ -27,15 +27,16 @@ public class WebDriverFactory {
 			driver =new ChromeDriver(options);
 			break;
 			
-		case "Firefox":
-			driver = new FirefoxDriver();
+		case "firefox":
+			System.setProperty("webdriver.gecko.driver","./src/resources/Drivers/geckodriver.exe");
+			driver = new FirefoxDriver();//geckodriver
 			break;
 			
 	/*	case "Htmlunit":
 			driver = new HtmlUnitDriver();
 			break;*/
 			
-		case "InternetExplore":
+		case "internetExplore":
 			System.setProperty("webdriver.ie.driver","./src/main/resources/Drivers/IEdriver.exe");
 			break;
 			

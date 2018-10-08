@@ -13,7 +13,9 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.openqa.selenium.Platform;
 
+import com.saran.testUtils.PlatformFactory;
 import com.saran.testUtils.TestParameters;
 
 
@@ -171,7 +173,7 @@ public class MSExcelReader {
 		int lastRowNum = worksheet.getLastRowNum();
 		
 		for(int i=0; i<=lastRowNum;i++) {
-			TestParameters testparameters = new TestParameters();
+			TestParameters testparameters = new TestParameters(); 
 			if(getData(Suite, i,"Execute").equalsIgnoreCase("Yes")) {
 				
 				testparameters.setCurrentTestcase(getData(Suite,i,"TC_ID"));
@@ -179,6 +181,7 @@ public class MSExcelReader {
 				testparameters.setDescription(getData(Suite,i,"Description"));
 				testparameters.setExecuteCurrentTestcase(getData(Suite,i,"Execute"));
 				testparameters.setBrowser(getData(Suite,i,"Browser"));
+				testparameters.setPlatform(PlatformFactory.getPlatform(getData(Suite,i,"Platform")));
 				runinfolist.add(testparameters);
 			}
 										

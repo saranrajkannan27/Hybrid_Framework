@@ -3,21 +3,26 @@ package com.saran.base;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.codepine.api.testrail.TestRailException;
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
 import com.relevantcodes.extentreports.LogStatus;
-
-import com.saran. testdataAccess.MSExcelReader;
+import com.saran.testUtils.PlatformFactory;
 import com.saran.testUtils.TestParameters;
 import com.saran.testUtils.TestRailListener;
 import com.saran.testUtils.Utility;
 import com.saran.testUtils.WebDriverFactory;
+import com.saran. testdataAccess.MSExcelReader;
 
 
 
@@ -102,8 +107,26 @@ public class ParallelRunnerWeb extends Utility implements Runnable {
 
 	private  void intializeWebDriver() {
 
-		driver = WebDriverFactory.getDriver(testParameters.getBrowser());
-		//driver.manage().window().maximize();
+		String gridmode= properties.getProperty("GridMode");
+		String gridURL= properties.getProperty("GridHubURL");
+
+		if(gridmode.equalsIgnoreCase("ON")) {
+
+			DesiredCapabilities capability= new DesiredCapabilities();
+			capability.setBrowserName(testParameters.getBrowser());
+			capability.setPlatform(testParameters.getPlatform());
+
+
+			try {
+				driver = new RemoteWebDriver(new URL(gridURL), capability);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+
+		}
+		else {
+			driver = WebDriverFactory.getDriver(testParameters.getBrowser());
+		}
 
 	}
 
@@ -130,33 +153,33 @@ public class ParallelRunnerWeb extends Utility implements Runnable {
 
 
 	private void testRailReport() {
-		
-		try {
-		
-		if(test.getRunStatus()==LogStatus.PASS && testRailEnabled.equalsIgnoreCase("true")) {
-			
-			int testRunID=Integer.parseInt(testRailProperties.getProperty("testRail.runId"));
-			int testcaseID=Integer.parseInt( testParameters.getTestRailId());
-			
-		testRailListenter.addTestResult(testRunID,testcaseID,1);
-		test.log(LogStatus.INFO, "Result for Test case with ID <b>" +  testParameters.getTestRailId() + "</b> is <b>PASSED</b> in TestRail");
-		}else {
-			
-		testRailListenter.addTestResult(Integer.parseInt(testRailProperties.getProperty("testRail.runId")),Integer.parseInt( testParameters.getTestRailId()),5);
-		test.log(LogStatus.INFO, "Result for Test case with ID <b>" +  testParameters.getTestRailId() + "</b> is <b>PASSED</b> in TestRail");
-			
-		}
-		}
-		catch(TestRailException e) {
-			
-			if(e.getResponseCode()==400) {
-				test.log(LogStatus.FAIL, "TestRail not updated for the testcase "+testParameters.getCurrentTestcase()+"  with testrail ID "+testParameters.getTestRailId());
-				test.log(LogStatus.INFO, e);
+		if( testRailEnabled.equalsIgnoreCase("true")) {
+			try {
+
+				if(test.getRunStatus()==LogStatus.PASS ) {
+
+					int testRunID=Integer.parseInt(testRailProperties.getProperty("testRail.runId"));
+					int testcaseID=Integer.parseInt( testParameters.getTestRailId());
+
+					testRailListenter.addTestResult(testRunID,testcaseID,1);
+					test.log(LogStatus.INFO, "Result for Test case with ID <b>" +  testParameters.getTestRailId() + "</b> is <b>PASSED</b> in TestRail");
+				}else {
+
+					testRailListenter.addTestResult(Integer.parseInt(testRailProperties.getProperty("testRail.runId")),Integer.parseInt( testParameters.getTestRailId()),5);
+					test.log(LogStatus.INFO, "Result for Test case with ID <b>" +  testParameters.getTestRailId() + "</b> is <b>PASSED</b> in TestRail");
+
+				}
 			}
-			
+			catch(TestRailException e) {
+
+				if(e.getResponseCode()==400) {
+					test.log(LogStatus.FAIL, "TestRail not updated for the testcase "+testParameters.getCurrentTestcase()+"  with testrail ID "+testParameters.getTestRailId());
+					test.log(LogStatus.INFO, e);
+				}
+
+			}
+
 		}
-
-
 		
 		
 		

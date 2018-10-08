@@ -1,4 +1,5 @@
 
+
 package com.saran.pages;
 
 import java.io.IOException;
@@ -38,8 +39,12 @@ public class LoginPage extends ReuseableLibrary {
 	public void login() {
 		
 	
-		driver.manage().timeouts().implicitlyWait(0, TimeUnit.MILLISECONDS);
+		//driver.manage().timeouts().implicitlyWait(0, TimeUnit.MILLISECONDS);
 		driver.get("https://www.google.in/");
+		
+		test.log(LogStatus.PASS, "Launched Google");
+		addSteps(LogStatus.PASS, "Launched the site");
+		
 		
 	 //driver.navigate().to("https://portal.bsnl.in/myportal/");
 	//	javascriptEntertext();

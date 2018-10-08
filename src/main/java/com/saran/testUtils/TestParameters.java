@@ -1,6 +1,6 @@
 package com.saran.testUtils;
 
-
+import org.openqa.selenium.Platform;
 
 public class TestParameters {
 	
@@ -10,6 +10,7 @@ public class TestParameters {
 	private String execute;
 	private String browser;
 	private String testRailId;
+	private Platform platform;
 	
 	public String getCurrentTestcase() {
 		return currentTestcase;
@@ -44,6 +45,13 @@ public class TestParameters {
 		return browser;
 	}
 	
+	public void setPlatform(Platform platform) {
+		this.platform = platform;
+	}
+	
+	public Platform getPlatform() {
+		return platform;
+	}
 	public String getTestRailId() {
 		return testRailId;
 	}

@@ -137,7 +137,7 @@ public class ParallelRunnerMobile implements Runnable {
 		builder.withAppiumJS(new File("C:\\Users\\Saran\\AppData\\Roaming\\npm\\node_modules\\appium\\build\\lib\\main.js"));
 		builder.withIPAddress("127.0.0.1");
 		builder.usingPort(4723);
-		builder.withArgument(GeneralServerFlag.SESSION_OVERRIDE);
+		builder.withArgument(GeneralServerFlag.SESSION_OVERRIDE); 
 		builder.withArgument(GeneralServerFlag.LOG_LEVEL,"debug");	
 		service = AppiumDriverLocalService.buildService(builder);
 		service.start();
@@ -155,7 +155,7 @@ public class ParallelRunnerMobile implements Runnable {
 		capabilities.setCapability("BROWSER_NAME", "Android");
 		capabilities.setCapability("VERSION", "4.4.2");
 		capabilities.setCapability("deviceName", "emulator-5554");
-		//capabilities.setCapability("app", absolutePath + "\\src\\main\\resources\\CATS-Mobility.apk");	
+		capabilities.setCapability("app", absolutePath + "\\src\\main\\resources\\CATS-Mobility.apk");	
 		capabilities.setCapability("appPackage","net.fulcrum.mobility" );
 		capabilities.setCapability("appActivity","net.fulcrum.mobility.activities.LoginActivity" );
 		capabilities.setCapability("unicodeKeyboard","true" );
